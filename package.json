@@ -1,0 +1,46 @@
+{
+  "name": "ft-base-tools",
+  "version": "1.0.0",
+  "description": "高效、轻量的前端工具库",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "rollup -c -w",
+    "build": "rollup -c",
+    "test": "jest",
+    "lint": "eslint src --ext .ts",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "keywords": [
+    "javascript",
+    "typescript",
+    "utils",
+    "tools",
+    "frontend"
+  ],
+  "author": "cgbin24",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^22.0.0",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@rollup/plugin-typescript": "^8.3.2",
+    "@types/jest": "^28.1.1",
+    "@typescript-eslint/eslint-plugin": "^5.27.1",
+    "@typescript-eslint/parser": "^5.27.1",
+    "eslint": "^8.17.0",
+    "jest": "^28.1.1",
+    "rollup": "^2.75.6",
+    "rollup-plugin-dts": "^4.2.2",
+    "rollup-plugin-terser": "^7.0.2",
+    "ts-jest": "^28.0.4",
+    "tslib": "^2.4.0",
+    "typescript": "^4.7.3",
+    "vitepress": "^1.0.0-alpha.4"
+  }
+}
