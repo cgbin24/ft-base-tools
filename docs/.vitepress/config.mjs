@@ -1,19 +1,19 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  title: '前端工具库',
+  title: 'ft-base-tools',
   description: '高效、轻量的前端工具库',
   lang: 'zh-CN',
   lastUpdated: true,
   
   themeConfig: {
-    logo: '/logo.png',
+    // logo: '/logo.png',
     nav: [
       { text: '首页', link: '/' },
       { text: '指南', link: '/guide/getting-started' },
       { text: 'API', link: '/api/date' },
       { text: '示例', link: '/examples/basic' },
-      { text: 'GitHub', link: 'https://github.com/yourusername/your-repo' }
+      { text: 'GitHub', link: 'https://github.com/cgbin24/ft-base-tools' }
     ],
     
     sidebar: {
@@ -32,7 +32,16 @@ export default defineConfig({
           items: [
             { text: '数组工具', link: '/api/array' },
             { text: '日期工具', link: '/api/date' },
-            { text: 'DOM 工具', link: '/api/dom' }
+            { text: 'DOM 工具', link: '/api/dom' },
+            { text: '对象工具', link: '/api/object' },
+            { text: '数学工具', link: '/api/math' },
+            { text: '验证工具', link: '/api/validate' },
+            { text: '存储工具', link: '/api/storage' },
+            { text: '类型工具', link: '/api/type' },
+            { text: 'URL 工具', link: '/api/url' },
+            { text: '浏览器工具', link: '/api/browser' },
+            { text: '网络工具', link: '/api/network' },
+            { text: '加密工具', link: '/api/crypto' },
           ]
         }
       ],

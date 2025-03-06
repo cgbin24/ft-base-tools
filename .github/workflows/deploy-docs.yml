@@ -1,1 +1,37 @@
- 
+ name: 部署文档
+
+on:
+  push:
+    branches:
+      - main  # 设置要触发部署的分支
+    paths:
+      - 'docs/**'  # 只有当docs目录下的文件变更时才触发
+      - '.github/workflows/deploy-docs.yml'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 构建文档
+        run: npm run docs:build
+
+      - name: 部署到 GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: docs/.vitepress/dist  # VitePress 构建输出目录
+          branch: gh-pages  # 部署到的分支
+          clean: true  # 清理旧文件
