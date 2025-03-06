@@ -24,10 +24,10 @@ jobs:
 
     - name: Build VitePress site
       run: |
-        npm run build
+        npm run docs:build
 
     - name: Deploy to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@v4.0.0
+      uses: JamesIves/github-pages-deploy-action@v4  # 使用最新的稳定版本 v4
       with:
         branch: gh-pages  # 指定部署到 gh-pages 分支
         folder: docs/.vitepress/dist  # VitePress 默认的构建输出路径
