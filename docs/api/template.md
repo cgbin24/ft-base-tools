@@ -561,3 +561,14 @@ console.log(Object.keys(helpers)); // ['formatDate']
 // 直接调用助手函数
 console.log(helpers.formatDate('2025-01-01')); // '2025年1月1日'
 ```
+
+```javascript
+// 修复前后的示例代码，确保所有的 {{ 都有对应的 }}
+const template = '你好，{{ name }}！今年{{ age }}岁了。';
+const data = {
+  name: '张三',
+  age: 25
+};
+const result = render(template, data);
+// 输出: 你好，张三！今年25岁了。
+```
