@@ -1,12 +1,12 @@
 ---
 layout: home
 hero:
-  name: 前端工具库
+  name: ft-base-tools
   text: 高效、轻量的JavaScript工具集合
   tagline: 简化前端开发，提高工作效率
-  image:
-    src: /logo.png
-    alt: 前端工具库
+  # image:
+  #   src: /logo.png
+  #   alt: 前端工具库
   actions:
     - theme: brand
       text: 快速开始
