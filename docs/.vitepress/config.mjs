@@ -5,7 +5,7 @@ export default defineConfig({
   description: '高效、轻量的前端工具库',
   lang: 'zh-CN',
   lastUpdated: true,
-  
+
   themeConfig: {
     // logo: '/logo.png',
     nav: [
@@ -37,11 +37,16 @@ export default defineConfig({
             { text: '数学工具', link: '/api/math' },
             { text: '验证工具', link: '/api/validate' },
             { text: '存储工具', link: '/api/storage' },
+            { text: '设备工具', link: '/api/device' },
+            { text: '格式化工具', link: '/api/format' },
+            { text: '字符串工具', link: '/api/string' },
             { text: '类型工具', link: '/api/type' },
             { text: 'URL 工具', link: '/api/url' },
             { text: '浏览器工具', link: '/api/browser' },
+            { text: '性能工具', link: '/api/performance' },
             { text: '网络工具', link: '/api/network' },
             { text: '加密工具', link: '/api/crypto' },
+            { text: '模板工具', link: '/api/template' },
           ]
         }
       ],
@@ -62,6 +67,9 @@ export default defineConfig({
     
     search: {
       provider: 'local'
+    },
+    vite: {
+      logLevel: 'debug'
     }
   }
 }) 

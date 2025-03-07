@@ -25,6 +25,7 @@
     "frontend"
   ],
   "author": "cgbin24",
+  "homepage": "https://github.com/cgbin24/ft-base-tools",
   "license": "MIT",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^22.0.0",
@@ -41,6 +42,6 @@
     "ts-jest": "^28.0.4",
     "tslib": "^2.4.0",
     "typescript": "^4.7.3",
-    "vitepress": "^1.0.0-alpha.4"
+    "vitepress": "^1.6.3"
   }
 }

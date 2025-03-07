@@ -1,10 +1,10 @@
 # 性能工具
 
-性能工具提供了一系列用于优化和监控应用性能的实用函数。
+性能工具提供了一系列用于优化代码执行效率和用户体验的实用函数。
 
 ## debounce
 
-创建一个防抖函数，延迟调用函数直到上一次调用后的指定时间已经过去。
+创建一个防抖函数，延迟调用函数直到上次调用后的指定时间已经过去。
 
 ### 语法
 
@@ -24,16 +24,16 @@ function debounce<T extends (...args: any[]) => any>(
 
 | 参数 | 类型 | 描述 |
 | --- | --- | --- |
-| func | T | 要防抖的函数 |
-| wait | number | 延迟的毫秒数 |
+| func | Function | 要防抖的函数 |
+| wait | number | 需要延迟的毫秒数 |
 | options | object | 可选。配置选项 |
-| options.leading | boolean | 可选。是否在延迟开始前调用函数，默认为 false |
-| options.trailing | boolean | 可选。是否在延迟结束后调用函数，默认为 true |
-| options.maxWait | number | 可选。最大等待时间，超过此时间必定调用一次函数 |
+| options.leading | boolean | 可选。指定在延迟开始前调用。默认为 false |
+| options.trailing | boolean | 可选。指定在延迟结束后调用。默认为 true |
+| options.maxWait | number | 可选。最大等待时间，超过这个时间函数会被调用 |
 
 ### 返回值
 
-返回新的防抖函数，该函数还具有 `cancel` 和 `flush` 方法。
+返回新的防抖函数，该函数具有 `cancel` 和 `flush` 方法。
 
 ### 示例
 
@@ -43,29 +43,31 @@ import { debounce } from 'ft-base-tools';
 // 基本用法
 const debouncedSave = debounce(() => {
   console.log('保存数据');
-  saveToServer();
-}, 500);
+}, 300);
 
-// 在输入框值变化时调用
-inputElement.addEventListener('input', debouncedSave);
+// 在用户输入时调用
+document.querySelector('input').addEventListener('input', debouncedSave);
+// 只有当用户停止输入 300 毫秒后才会执行保存操作
 
 // 带选项的用法
-const debouncedSearch = debounce(searchFunction, 300, {
-  leading: true,  // 立即执行第一次调用
-  trailing: true, // 延迟结束后也执行
-  maxWait: 1000   // 最多等待1秒
-});
+const debouncedResize = debounce(() => {
+  console.log('调整大小');
+}, 200, { leading: true, trailing: true, maxWait: 1000 });
+
+window.addEventListener('resize', debouncedResize);
+// 窗口大小改变时立即执行一次，然后等待 200 毫秒后再次执行
+// 如果持续调整大小超过 1000 毫秒，则强制执行一次
 
 // 取消防抖
-debouncedSearch.cancel();
+debouncedSave.cancel();
 
-// 立即调用
-debouncedSearch.flush();
+// 立即执行
+debouncedSave.flush();
 ```
 
 ## throttle
 
-创建一个节流函数，限制函数在一段时间内最多执行一次。
+创建一个节流函数，限制函数在指定时间内最多执行一次。
 
 ### 语法
 
@@ -84,15 +86,15 @@ function throttle<T extends (...args: any[]) => any>(
 
 | 参数 | 类型 | 描述 |
 | --- | --- | --- |
-| func | T | 要节流的函数 |
-| wait | number | 限制的毫秒数 |
+| func | Function | 要节流的函数 |
+| wait | number | 需要节流的毫秒数 |
 | options | object | 可选。配置选项 |
-| options.leading | boolean | 可选。是否在节流开始前调用函数，默认为 true |
-| options.trailing | boolean | 可选。是否在节流结束后调用函数，默认为 true |
+| options.leading | boolean | 可选。指定在节流开始前调用。默认为 true |
+| options.trailing | boolean | 可选。指定在节流结束后调用。默认为 true |
 
 ### 返回值
 
-返回新的节流函数，该函数还具有 `cancel` 和 `flush` 方法。
+返回新的节流函数，该函数具有 `cancel` 和 `flush` 方法。
 
 ### 示例
 
@@ -101,24 +103,18 @@ import { throttle } from 'ft-base-tools';
 
 // 基本用法
 const throttledScroll = throttle(() => {
-  console.log('滚动事件处理');
-  updateScrollIndicator();
+  console.log('滚动事件');
 }, 100);
 
-// 在滚动时调用
 window.addEventListener('scroll', throttledScroll);
+// 滚动事件最多每 100 毫秒触发一次
 
 // 带选项的用法
-const throttledResize = throttle(resizeHandler, 200, {
-  leading: false,  // 不立即执行第一次调用
-  trailing: true   // 节流结束后执行最后一次调用
-});
-
-// 取消节流
-throttledResize.cancel();
-
-// 立即调用
-throttledResize.flush();
+window.addEventListener('resize', throttle(() => {
+  // 这里是节流函数的回调
+  console.log('窗口大小改变了！');
+}, 500));
+// 每 500 毫秒最多执行一次回调函数
 ```
 
 ## memoize
@@ -130,27 +126,20 @@ throttledResize.flush();
 ```typescript
 function memoize<T extends (...args: any[]) => any>(
   func: T,
-  options?: {
-    resolver?: (...args: Parameters<T>) => string;
-    maxSize?: number;
-    ttl?: number;
-  }
-): T & { cache: Map<string, any>; clear: () => void }
+  resolver?: (...args: Parameters<T>) => any
+): T & { cache: Map<any, any>; clear: () => void }
 ```
 
 ### 参数
 
 | 参数 | 类型 | 描述 |
 | --- | --- | --- |
-| func | T | 要缓存结果的函数 |
-| options | object | 可选。配置选项 |
-| options.resolver | (...args: Parameters<T>) => string | 可选。自定义参数解析器，用于生成缓存键 |
-| options.maxSize | number | 可选。缓存的最大条目数 |
-| options.ttl | number | 可选。缓存条目的生存时间（毫秒） |
+| func | Function | 要缓存结果的函数 |
+| resolver | Function | 可选。自定义缓存键的解析函数 |
 
 ### 返回值
 
-返回新的带缓存的函数，该函数还具有 `cache` 属性和 `clear` 方法。
+返回新的记忆化函数，该函数具有 `cache` 属性和 `clear` 方法。
 
 ### 示例
 
@@ -165,21 +154,17 @@ const fibonacci = memoize((n) => {
 
 console.log(fibonacci(40)); // 快速计算，因为中间结果被缓存
 
-// 自定义解析器
+// 自定义缓存键
 const getUser = memoize(
-  (id, includeDetails) => fetchUserFromAPI(id, includeDetails),
-  {
-    resolver: (id, includeDetails) => `${id}-${includeDetails}`,
-    maxSize: 100, // 最多缓存100个用户
-    ttl: 60000    // 缓存1分钟
-  }
+  (id, force = false) => {
+    return fetch(`/api/users/${id}`).then(res => res.json());
+  },
+  (id) => id // 只使用 id 作为缓存键，忽略 force 参数
 );
 
 // 清除缓存
-getUser.clear();
-
-// 访问缓存
-console.log(getUser.cache.size); // 缓存中的条目数
+fibonacci.clear();
+console.log(fibonacci.cache); // 空的 Map
 ```
 
 ## once
@@ -196,7 +181,7 @@ function once<T extends (...args: any[]) => any>(func: T): T
 
 | 参数 | 类型 | 描述 |
 | --- | --- | --- |
-| func | T | 要包装的函数 |
+| func | Function | 要包装的函数 |
 
 ### 返回值
 
@@ -210,13 +195,14 @@ import { once } from 'ft-base-tools';
 // 基本用法
 const initialize = once(() => {
   console.log('初始化应用');
-  setupApp();
+  // 执行初始化逻辑
 });
 
 // 多次调用，但只会执行一次
 initialize();
-initialize(); // 不会执行
-initialize(); // 不会执行
+initialize();
+initialize();
+// 控制台只会输出一次 "初始化应用"
 ```
 
 ## delay
@@ -226,372 +212,10 @@ initialize(); // 不会执行
 ### 语法
 
 ```typescript
-function delay<T extends (...args: any[]) => any>(
-  func: T,
+function delay(
+  func: (...args: any[]) => any,
   wait: number,
-  ...args: Parameters<T>
-): Promise<ReturnType<T>>
-```
-
-### 参数
-
-| 参数 | 类型 | 描述 |
-| --- | --- | --- |
-| func | T | 要延迟执行的函数 |
-| wait | number | 延迟的毫秒数 |
-| args | Parameters<T> | 传递给函数的参数 |
-
-### 返回值
-
-返回一个 Promise，解析为函数的返回值。
-
-### 示例
-
-```javascript
-import { delay } from 'ft-base-tools';
-
-// 基本用法
-delay(() => {
-  console.log('3秒后执行');
-}, 3000);
-
-// 带参数
-delay((name) => {
-  console.log(`你好，${name}！`);
-  return `问候 ${name}`;
-}, 2000, '张三')
-  .then(result => {
-    console.log(result); // "问候 张三"
-  });
-
-// 异步函数
-async function example() {
-  console.log('开始');
-  await delay(() => {
-    console.log('2秒后');
-  }, 2000);
-  console.log('结束');
-}
-```
-
-## measure
-
-测量函数执行时间。
-
-### 语法
-
-```typescript
-function measure<T extends (...args: any[]) => any>(
-  func: T,
-  options?: {
-    name?: string;
-    callback?: (duration: number, result: ReturnType<T>, ...args: Parameters<T>) => void;
-  }
-): T
-```
-
-### 参数
-
-| 参数 | 类型 | 描述 |
-| --- | --- | --- |
-| func | T | 要测量的函数 |
-| options | object | 可选。配置选项 |
-| options.name | string | 可选。测量名称，用于日志输出 |
-| options.callback | function | 可选。测量完成后的回调函数 |
-
-### 返回值
-
-返回包装后的函数，执行时会测量时间。
-
-### 示例
-
-```javascript
-import { measure } from 'ft-base-tools';
-
-// 基本用法
-const measuredSort = measure(sortArray, {
-  name: '数组排序',
-  callback: (duration) => {
-    console.log(`排序耗时: ${duration}ms`);
-  }
-});
-
-// 调用函数
-const sortedArray = measuredSort(largeArray);
-
-// 异步函数测量
-const measuredFetch = measure(async (url) => {
-  const response = await fetch(url);
-  return response.json();
-}, {
-  name: 'API请求',
-  callback: (duration, result, url) => {
-    console.log(`请求 ${url} 耗时: ${duration}ms`);
-  }
-});
-
-// 调用异步函数
-measuredFetch('https://api.example.com/data')
-  .then(data => {
-    console.log(data);
-  });
-```
-
-## benchmark
-
-对函数进行基准测试，多次执行并计算平均时间。
-
-### 语法
-
-```typescript
-function benchmark<T extends (...args: any[]) => any>(
-  func: T,
-  options?: {
-    iterations?: number;
-    warmup?: number;
-    args?: Parameters<T>;
-  }
-): Promise<{
-  mean: number;
-  min: number;
-  max: number;
-  total: number;
-  iterations: number;
-}>
-```
-
-### 参数
-
-| 参数 | 类型 | 描述 |
-| --- | --- | --- |
-| func | T | 要测试的函数 |
-| options | object | 可选。配置选项 |
-| options.iterations | number | 可选。测试迭代次数，默认为 100 |
-| options.warmup | number | 可选。预热迭代次数，默认为 5 |
-| options.args | Parameters<T> | 可选。传递给函数的参数 |
-
-### 返回值
-
-返回一个 Promise，解析为包含测试结果的对象。
-
-### 示例
-
-```javascript
-import { benchmark } from 'ft-base-tools';
-
-// 基本用法
-async function runBenchmark() {
-  const result = await benchmark(() => {
-    // 要测试的代码
-    const arr = [];
-    for (let i = 0; i < 1000; i++) {
-      arr.push(i);
-    }
-    return arr.reduce((sum, val) => sum + val, 0);
-  }, {
-    iterations: 1000, // 执行1000次
-    warmup: 10        // 预热10次
-  });
-  
-  console.log(`平均执行时间: ${result.mean.toFixed(3)}ms`);
-  console.log(`最小执行时间: ${result.min.toFixed(3)}ms`);
-  console.log(`最大执行时间: ${result.max.toFixed(3)}ms`);
-  console.log(`总执行时间: ${result.total.toFixed(3)}ms`);
-  console.log(`迭代次数: ${result.iterations}`);
-}
-
-// 带参数的基准测试
-async function compareSortAlgorithms() {
-  const testArray = Array.from({ length: 10000 }, () => Math.random());
-  
-  const quickSortResult = await benchmark(quickSort, {
-    iterations: 100,
-    args: [testArray.slice()]
-  });
-  
-  const mergeSortResult = await benchmark(mergeSort, {
-    iterations: 100,
-    args: [testArray.slice()]
-  });
-  
-  console.log(`快速排序平均时间: ${quickSortResult.mean.toFixed(3)}ms`);
-  console.log(`归并排序平均时间: ${mergeSortResult.mean.toFixed(3)}ms`);
-}
-```
-
-## profile
-
-创建一个性能分析器，用于测量代码块的执行时间。
-
-### 语法
-
-```typescript
-function profile(name?: string): {
-  start: (label: string) => void;
-  end: (label: string) => number;
-  mark: (label: string) => void;
-  getTimings: () => Record<string, { start: number; end: number; duration: number }>;
-  clear: () => void;
-  report: () => void;
-}
-```
-
-### 参数
-
-| 参数 | 类型 | 描述 |
-| --- | --- | --- |
-| name | string | 可选。分析器名称 |
-
-### 返回值
-
-返回一个性能分析器对象，包含 start、end、mark、getTimings、clear 和 report 方法。
-
-### 示例
-
-```javascript
-import { profile } from 'ft-base-tools';
-
-// 创建分析器
-const profiler = profile('应用初始化');
-
-// 开始测量
-profiler.start('加载配置');
-// 加载配置的代码
-loadConfig();
-profiler.end('加载配置');
-
-// 测量另一个代码块
-profiler.start('初始化组件');
-// 初始化组件的代码
-initComponents();
-profiler.end('初始化组件');
-
-// 添加标记点
-profiler.mark('用户交互开始');
-
-// 获取所有计时
-const timings = profiler.getTimings();
-console.log(timings);
-/*
-{
-  '加载配置': { start: 1234567890, end: 1234567900, duration: 10 },
-  '初始化组件': { start: 1234567901, end: 1234567930, duration: 29 },
-  '用户交互开始': { time: 1234567940 }
-}
-*/
-
-// 输出报告
-profiler.report();
-/*
-应用初始化性能报告:
-- 加载配置: 10ms
-- 初始化组件: 29ms
-- 标记 - 用户交互开始: 1234567940ms
-总计: 39ms
-*/
-
-// 清除计时
-profiler.clear();
-```
-
-## lazyLoad
-
-延迟加载资源，如图片、脚本或组件。
-
-### 语法
-
-```typescript
-function lazyLoad<T>(
-  loader: () => Promise<T>,
-  options?: {
-    condition?: () => boolean;
-    timeout?: number;
-    retry?: number;
-    retryDelay?: number;
-    onLoad?: (result: T) => void;
-    onError?: (error: Error) => void;
-  }
-): Promise<T>
-```
-
-### 参数
-
-| 参数 | 类型 | 描述 |
-| --- | --- | --- |
-| loader | () => Promise<T> | 加载资源的函数 |
-| options | object | 可选。配置选项 |
-| options.condition | () => boolean | 可选。加载条件，返回 true 时才加载 |
-| options.timeout | number | 可选。超时时间（毫秒） |
-| options.retry | number | 可选。失败重试次数 |
-| options.retryDelay | number | 可选。重试延迟（毫秒） |
-| options.onLoad | (result: T) => void | 可选。加载成功回调 |
-| options.onError | (error: Error) => void | 可选。加载失败回调 |
-
-### 返回值
-
-返回一个 Promise，解析为加载的资源。
-
-### 示例
-
-```javascript
-import { lazyLoad } from 'ft-base-tools';
-
-// 延迟加载图片
-function loadImage(src) {
-  return lazyLoad(() => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = reject;
-      img.src = src;
-    });
-  }, {
-    condition: () => isInViewport(placeholderElement),
-    retry: 3,
-    retryDelay: 1000,
-    onLoad: (img) => {
-      console.log('图片加载成功', img.src);
-      placeholderElement.appendChild(img);
-    },
-    onError: (error) => {
-      console.error('图片加载失败', error);
-      placeholderElement.innerHTML = '加载失败';
-    }
-  });
-}
-
-// 延迟加载组件
-function loadComponent(name) {
-  return lazyLoad(() => {
-    switch (name) {
-      case 'Chart':
-        return import('./components/Chart.js');
-      case 'Table':
-        return import('./components/Table.js');
-      default:
-        throw new Error(`未知组件: ${name}`);
-    }
-  }, {
-    timeout: 5000,
-    onLoad: (module) => {
-      console.log(`组件 ${name} 加载成功`);
-    }
-  });
-}
-```
-
-## requestIdleCallback
-
-在浏览器空闲时执行任务，兼容不支持原生 requestIdleCallback 的浏览器。
-
-### 语法
-
-```typescript
-function requestIdleCallback(
-  callback: (deadline: { timeRemaining: () => number; didTimeout: boolean }) => void,
-  options?: {
-    timeout?: number;
-  }
+  ...args: any[]
 ): number
 ```
 
@@ -599,106 +223,86 @@ function requestIdleCallback(
 
 | 参数 | 类型 | 描述 |
 | --- | --- | --- |
-| callback | function | 在空闲时执行的回调函数 |
-| options | object | 可选。配置选项 |
-| options.timeout | number | 可选。超时时间（毫秒） |
+| func | Function | 要延迟的函数 |
+| wait | number | 延迟的毫秒数 |
+| ...args | any[] | 传递给函数的参数 |
 
 ### 返回值
 
-返回一个 ID，可用于取消回调。
+返回定时器 ID，可用于取消延迟执行。
 
 ### 示例
 
 ```javascript
-import { requestIdleCallback, cancelIdleCallback } from 'ft-base-tools';
+import { delay } from 'ft-base-tools';
 
 // 基本用法
-const idleId = requestIdleCallback((deadline) => {
-  // 检查还有多少时间可用
-  console.log(`剩余时间: ${deadline.timeRemaining()}ms`);
-  
-  // 如果有足够的时间，执行任务
-  if (deadline.timeRemaining() > 5 || deadline.didTimeout) {
-    performNonUrgentTask();
-  } else {
-    // 没有足够的时间，将任务分割或推迟
-    scheduleTaskForLater();
-  }
-}, {
-  timeout: 2000 // 最多等待2秒
-});
+const timerId = delay(() => {
+  console.log('3 秒后执行');
+}, 3000);
 
-// 取消回调
-cancelIdleCallback(idleId);
+// 带参数的用法
+delay((name) => {
+  console.log(`你好，${name}！`);
+}, 1000, '张三');
+// 1 秒后输出 "你好，张三！"
 
-// 分批处理大量数据
-function processBatch(data, batchSize, processItem) {
-  let currentIndex = 0;
-  
-  function processNextBatch() {
-    requestIdleCallback((deadline) => {
-      // 处理一批数据，直到没有时间或处理完成
-      while (currentIndex < data.length && 
-             (deadline.timeRemaining() > 0 || deadline.didTimeout)) {
-        processItem(data[currentIndex]);
-        currentIndex++;
-        
-        // 如果已处理一批数据，暂停并让出控制权
-        if (currentIndex % batchSize === 0) {
-          break;
-        }
-      }
-      
-      // 如果还有数据，继续处理下一批
-      if (currentIndex < data.length) {
-        processNextBatch();
-      } else {
-        console.log('所有数据处理完成');
-      }
-    });
-  }
-  
-  processNextBatch();
-}
+// 取消延迟执行
+clearTimeout(timerId);
 ```
 
-## cancelIdleCallback
+## defer
 
-取消先前通过 requestIdleCallback 安排的回调。
+将函数推迟到当前调用栈清空后执行。
 
 ### 语法
 
 ```typescript
-function cancelIdleCallback(id: number): void
+function defer(
+  func: (...args: any[]) => any,
+  ...args: any[]
+): number
 ```
 
 ### 参数
 
 | 参数 | 类型 | 描述 |
 | --- | --- | --- |
-| id | number | 要取消的回调 ID |
+| func | Function | 要推迟的函数 |
+| ...args | any[] | 传递给函数的参数 |
+
+### 返回值
+
+返回定时器 ID，可用于取消推迟执行。
 
 ### 示例
 
 ```javascript
-import { requestIdleCallback, cancelIdleCallback } from 'ft-base-tools';
+import { defer } from 'ft-base-tools';
 
-const idleId = requestIdleCallback(() => {
-  performNonUrgentTask();
+// 基本用法
+const timerId = defer(() => {
+  console.log('当前调用栈清空后执行');
 });
 
-// 取消回调
-cancelIdleCallback(idleId);
+// 带参数的用法
+defer((a, b) => {
+  console.log(a + b);
+}, 3, 4);
+// 输出 7
+
+// 取消推迟执行
+clearTimeout(timerId);
 ```
 
-## requestAnimationFrame
+## raf
 
-请求动画帧，兼容不支持原生 requestAnimationFrame 的浏览器。
+使用 requestAnimationFrame 执行函数。
 
 ### 语法
 
 ```typescript
-function requestAnimationFrame(callback: FrameRequestCallback): number
+function raf(callback: FrameRequestCallback): number
 ```
 
 ### 参数
@@ -709,66 +313,31 @@ function requestAnimationFrame(callback: FrameRequestCallback): number
 
 ### 返回值
 
-返回一个 ID，可用于取消请求。
+返回请求 ID，可用于取消请求。
 
 ### 示例
 
 ```javascript
-import { requestAnimationFrame, cancelAnimationFrame } from 'ft-base-tools';
+import { raf } from 'ft-base-tools';
 
 // 基本用法
-let position = 0;
-let animationId;
+const requestId = raf((timestamp) => {
+  console.log(`当前时间戳: ${timestamp}`);
+  // 执行动画逻辑
+});
 
-function animate() {
-  position += 5;
-  element.style.transform = `translateX(${position}px)`;
-  
-  if (position < 500) {
-    animationId = requestAnimationFrame(animate);
-  }
-}
-
-// 开始动画
-animationId = requestAnimationFrame(animate);
-
-// 取消动画
-cancelAnimationFrame(animationId);
-
-// 平滑滚动
-function smoothScroll(targetY, duration) {
-  const startY = window.scrollY;
-  const distance = targetY - startY;
-  const startTime = performance.now();
-  
-  function step(currentTime) {
-    const elapsed = currentTime - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    const easeProgress = easeInOutCubic(progress);
-    
-    window.scrollTo(0, startY + distance * easeProgress);
-    
-    if (progress < 1) {
-      requestAnimationFrame(step);
-    }
-  }
-  
-  requestAnimationFrame(step);
-}
-
-function easeInOutCubic(t) {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-}
+// 取消请求
+cancelAnimationFrame(requestId);
 ```
 
-## cancelAnimationFrame
+## caf
 
-取消先前通过 requestAnimationFrame 安排的回调。
+取消之前的 requestAnimationFrame 请求。
 
 ### 语法
 
 ```typescript
-function cancelAnimationFrame(id: number): void
+function caf(id: number): void
 ```
 
 ### 参数
@@ -780,12 +349,381 @@ function cancelAnimationFrame(id: number): void
 ### 示例
 
 ```javascript
-import { requestAnimationFrame, cancelAnimationFrame } from 'ft-base-tools';
+import { raf, caf } from 'ft-base-tools';
 
-const animationId = requestAnimationFrame(() => {
-  updateAnimation();
+// 创建请求
+const requestId = raf(() => {
+  console.log('动画帧');
 });
 
-// 取消动画
-cancelAnimationFrame(animationId);
+// 取消请求
+caf(requestId);
+```
+
+## nextTick
+
+在下一个微任务中执行回调函数。
+
+### 语法
+
+```typescript
+function nextTick(callback: (...args: any[]) => any): void
+```
+
+### 参数
+
+| 参数 | 类型 | 描述 |
+| --- | --- | --- |
+| callback | Function | 要执行的回调函数 |
+
+### 示例
+
+```javascript
+import { nextTick } from 'ft-base-tools';
+
+// 基本用法
+console.log('开始');
+
+nextTick(() => {
+  console.log('在微任务中执行');
+});
+
+console.log('结束');
+
+// 输出顺序:
+// "开始"
+// "结束"
+// "在微任务中执行"
+```
+
+## measureTime
+
+测量函数执行时间。
+
+### 语法
+
+```typescript
+function measureTime<T>(
+  fn: () => T,
+  options?: {
+    label?: string;
+    console?: boolean;
+  }
+): { result: T; time: number }
+```
+
+### 参数
+
+| 参数 | 类型 | 描述 |
+| --- | --- | --- |
+| fn | Function | 要测量的函数 |
+| options | object | 可选。配置选项 |
+| options.label | string | 可选。输出标签 |
+| options.console | boolean | 可选。是否在控制台输出结果。默认为 true |
+
+### 返回值
+
+返回一个对象，包含函数的返回值和执行时间（毫秒）。
+
+### 示例
+
+```javascript
+import { measureTime } from 'ft-base-tools';
+
+// 基本用法
+const { result, time } = measureTime(() => {
+  let sum = 0;
+  for (let i = 0; i < 1000000; i++) {
+    sum += i;
+  }
+  return sum;
+});
+
+console.log(`结果: ${result}, 耗时: ${time}ms`);
+
+// 带选项的用法
+measureTime(() => {
+  // 执行一些耗时操作
+  return '完成';
+}, {
+  label: '复杂计算',
+  console: true
+});
+// 控制台输出: "复杂计算: XXXms"
+```
+
+## batchProcessing
+
+分批处理大量数据，避免阻塞主线程。
+
+### 语法
+
+```typescript
+function batchProcessing<T, R>(
+  items: T[],
+  processor: (item: T, index: number) => R,
+  options?: {
+    batchSize?: number;
+    delay?: number;
+    onBatchComplete?: (results: R[], batchIndex: number) => void;
+    onComplete?: (allResults: R[]) => void;
+  }
+): { cancel: () => void }
+```
+
+### 参数
+
+| 参数 | 类型 | 描述 |
+| --- | --- | --- |
+| items | T[] | 要处理的数据项数组 |
+| processor | Function | 处理每个数据项的函数 |
+| options | object | 可选。配置选项 |
+| options.batchSize | number | 可选。每批处理的数据项数量。默认为 100 |
+| options.delay | number | 可选。批次之间的延迟毫秒数。默认为 0 |
+| options.onBatchComplete | Function | 可选。每批处理完成的回调 |
+| options.onComplete | Function | 可选。所有数据处理完成的回调 |
+
+### 返回值
+
+返回一个对象，包含 `cancel` 方法用于取消处理。
+
+### 示例
+
+```javascript
+import { batchProcessing } from 'ft-base-tools';
+
+// 基本用法
+const items = Array.from({ length: 10000 }, (_, i) => i);
+
+const { cancel } = batchProcessing(
+  items,
+  (item) => item * 2,
+  {
+    batchSize: 500,
+    delay: 10,
+    onBatchComplete: (results, batchIndex) => {
+      console.log(`完成批次 ${batchIndex + 1}`);
+    },
+    onComplete: (allResults) => {
+      console.log(`所有 ${allResults.length} 项处理完成`);
+    }
+  }
+);
+
+// 取消处理
+// cancel();
+```
+
+## idleCallback
+
+在浏览器空闲时执行低优先级任务。
+
+### 语法
+
+```typescript
+function idleCallback(
+  callback: (deadline: { timeRemaining: () => number; didTimeout: boolean }) => void,
+  options?: { timeout?: number }
+): number
+```
+
+### 参数
+
+| 参数 | 类型 | 描述 |
+| --- | --- | --- |
+| callback | Function | 在空闲时期被调用的函数 |
+| options | object | 可选。配置选项 |
+| options.timeout | number | 可选。超时时间，超过这个时间任务会被强制执行 |
+
+### 返回值
+
+返回请求 ID，可用于取消请求。
+
+### 示例
+
+```javascript
+import { idleCallback, cancelIdleCallback } from 'ft-base-tools';
+
+// 基本用法
+const id = idleCallback((deadline) => {
+  // 检查还剩多少时间
+  console.log(`剩余时间: ${deadline.timeRemaining()}ms`);
+  
+  // 执行低优先级任务
+  while (deadline.timeRemaining() > 0 && tasksRemaining()) {
+    doTask();
+  }
+  
+  // 如果还有任务，再次请求
+  if (tasksRemaining()) {
+    idleCallback(callback);
+  }
+}, { timeout: 2000 });
+
+// 取消请求
+cancelIdleCallback(id);
+
+// 辅助函数
+function tasksRemaining() {
+  // 检查是否还有任务
+  return true;
+}
+
+function doTask() {
+  // 执行一个小任务
+}
+```
+
+## cancelIdleCallback
+
+取消之前的 idleCallback 请求。
+
+### 语法
+
+```typescript
+function cancelIdleCallback(id: number): void
+```
+
+### 参数
+
+| 参数 | 类型 | 描述 |
+| --- | --- | --- |
+| id | number | 要取消的请求 ID |
+
+### 示例
+
+```javascript
+import { idleCallback, cancelIdleCallback } from 'ft-base-tools';
+
+// 创建请求
+const id = idleCallback(() => {
+  console.log('浏览器空闲时执行');
+});
+
+// 取消请求
+cancelIdleCallback(id);
+```
+
+## asyncPool
+
+限制并发异步任务数量。
+
+### 语法
+
+```typescript
+function asyncPool<T, R>(
+  concurrency: number,
+  items: T[],
+  iteratorFn: (item: T, index: number) => Promise<R>
+): Promise<R[]>
+```
+
+### 参数
+
+| 参数 | 类型 | 描述 |
+| --- | --- | --- |
+| concurrency | number | 同时运行的任务数量上限 |
+| items | T[] | 要处理的数据项数组 |
+| iteratorFn | Function | 处理每个数据项的异步函数 |
+
+### 返回值
+
+返回一个 Promise，解析为所有任务的结果数组。
+
+### 示例
+
+```javascript
+import { asyncPool } from 'ft-base-tools';
+
+// 基本用法
+async function fetchUserData(id) {
+  const response = await fetch(`https://api.example.com/users/${id}`);
+  return response.json();
+}
+
+const userIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+// 最多同时运行 3 个请求
+asyncPool(3, userIds, fetchUserData)
+  .then(users => {
+    console.log(`获取了 ${users.length} 个用户的数据`);
+  })
+  .catch(error => {
+    console.error('获取用户数据时出错:', error);
+  });
+```
+
+## retry
+
+自动重试失败的异步操作。
+
+### 语法
+
+```typescript
+function retry<T>(
+  fn: () => Promise<T>,
+  options?: {
+    retries?: number;
+    interval?: number;
+    exponential?: boolean;
+    factor?: number;
+    onRetry?: (error: Error, attempt: number) => void;
+  }
+): Promise<T>
+```
+
+### 参数
+
+| 参数 | 类型 | 描述 |
+| --- | --- | --- |
+| fn | Function | 要重试的异步函数 |
+| options | object | 可选。配置选项 |
+| options.retries | number | 可选。最大重试次数。默认为 3 |
+| options.interval | number | 可选。重试间隔（毫秒）。默认为 1000 |
+| options.exponential | boolean | 可选。是否使用指数退避策略。默认为 true |
+| options.factor | number | 可选。指数退避因子。默认为 2 |
+| options.onRetry | Function | 可选。每次重试前调用的函数 |
+
+### 返回值
+
+返回一个 Promise，解析为异步操作的结果，或在达到最大重试次数后拒绝。
+
+### 示例
+
+```javascript
+import { retry } from 'ft-base-tools';
+
+// 基本用法
+async function fetchData() {
+  // 模拟可能失败的请求
+  const response = await fetch('https://api.example.com/data');
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return response.json();
+}
+
+// 最多重试 5 次，每次间隔 2 秒
+retry(fetchData, {
+  retries: 5,
+  interval: 2000,
+  onRetry: (error, attempt) => {
+    console.log(`尝试 ${attempt}: 失败 - ${error.message}`);
+  }
+})
+  .then(data => {
+    console.log('成功获取数据:', data);
+  })
+  .catch(error => {
+    console.error('所有重试都失败了:', error);
+  });
+
+// 使用指数退避策略
+retry(fetchData, {
+  retries: 4,
+  interval: 1000,
+  exponential: true,
+  factor: 3
+});
+// 重试间隔: 1s, 3s, 9s, 27s
 ``` 

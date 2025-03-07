@@ -460,8 +460,8 @@ function template(
 | str | string | 模板字符串 |
 | data | Record<string, any> | 替换数据 |
 | options | object | 可选。模板选项 |
-| options.openTag | string | 可选。开始标记，默认为 '{{' |
-| options.closeTag | string | 可选。结束标记，默认为 '}}' |
+| options.openTag | string | 可选。开始标记，默认为 `\{\{` |
+| options.closeTag | string | 可选。结束标记，默认为 `\}\}` |
 
 ### 返回值
 
@@ -469,25 +469,26 @@ function template(
 
 ### 示例
 
-```javascript
+```js
 import { template } from 'ft-base-tools';
 
-const tmpl = '你好，{{name}}！今天是{{date}}。';
+// 基本用法
+const tpl = `你好，\{\{name\}\}！今年\{\{age\}\}岁了。`;
 const data = {
   name: '张三',
-  date: '2025年1月1日'
+  age: 25
 };
 
-console.log(template(tmpl, data));
-// '你好，张三！今天是2025年1月1日。'
+console.log(template(tpl, data));
+// 输出: 你好，张三！今年25岁了。
 
 // 使用自定义标记
-const customTmpl = '你好，${name}！今天是${date}。';
-console.log(template(customTmpl, data, {
+const customTpl = `你好，\${name}！`;
+console.log(template(customTpl, { name: '张三' }, {
   openTag: '${',
   closeTag: '}'
 }));
-// '你好，张三！今天是2025年1月1日。'
+// 输出: 你好，张三！
 ```
 
 ## byteSize

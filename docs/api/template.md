@@ -2,6 +2,8 @@
 
 模板工具提供了一系列用于处理字符串模板和生成 HTML 的实用函数。
 
+> 注意⚠️：当阅读当前文档时，你可能会看到这样一种方式`{-{`，这里本应是双括号没有中间`-`的，是因为这是 VitePress 在解析 Markdown 文件时与 Vue 模板语法冲突导致的问题。VitePress 使用 Vue 作为渲染引擎，所以当 Markdown 文件中包含 {{ 和 }} 这样的模板语法标记时，Vue 会尝试将其解析为模板表达式，而不是将其视为普通文本。
+
 ## compile
 
 编译模板字符串，生成渲染函数。
@@ -25,7 +27,7 @@ function compile(
 | --- | --- | --- |
 | template | string | 模板字符串 |
 | options | object | 可选。编译选项 |
-| options.openTag | string | 可选。开始标记，默认为 '{{' |
+| options.openTag | string | 可选。开始标记，默认为 '{-{' |
 | options.closeTag | string | 可选。结束标记，默认为 '}}' |
 | options.escape | boolean | 可选。是否自动转义 HTML，默认为 true |
 
@@ -35,12 +37,12 @@ function compile(
 
 ### 示例
 
-```javascript
+```js
 import { compile } from 'ft-base-tools';
 
 // 基本用法
-const template = '你好，{{name}}！今天是{{date}}。';
-const render = compile(template);
+const tpl = '你好，{-{name}}！今天是{-{date}}。';
+const render = compile(tpl);
 
 const data = {
   name: '张三',
@@ -48,24 +50,24 @@ const data = {
 };
 
 console.log(render(data));
-// '你好，张三！今天是2025年1月1日。'
+// 输出: '你好，张三！今天是2025年1月1日。'
 
 // 自定义标记
-const customTemplate = '你好，${name}！今天是${date}。';
-const customRender = compile(customTemplate, {
+const customTpl = '你好，${name}！今天是${date}。';
+const customRender = compile(customTpl, {
   openTag: '${',
   closeTag: '}'
 });
 
 console.log(customRender(data));
-// '你好，张三！今天是2025年1月1日。'
+// 输出: '你好，张三！今天是2025年1月1日。'
 
 // 禁用 HTML 转义
-const htmlTemplate = '<div>{{content}}</div>';
-const htmlRender = compile(htmlTemplate, { escape: false });
+const htmlTpl = '<div>{-{content}}</div>';
+const htmlRender = compile(htmlTpl, { escape: false });
 
 console.log(htmlRender({ content: '<strong>加粗文本</strong>' }));
-// '<div><strong>加粗文本</strong></div>'
+// 输出: '<div><strong>加粗文本</strong></div>'
 ```
 
 ## render
@@ -93,7 +95,7 @@ function render(
 | template | string | 模板字符串 |
 | data | Record<string, any> | 渲染数据 |
 | options | object | 可选。渲染选项 |
-| options.openTag | string | 可选。开始标记，默认为 '{{' |
+| options.openTag | string | 可选。开始标记，默认为 '{-{' |
 | options.closeTag | string | 可选。结束标记，默认为 '}}' |
 | options.escape | boolean | 可选。是否自动转义 HTML，默认为 true |
 
@@ -107,7 +109,7 @@ function render(
 import { render } from 'ft-base-tools';
 
 // 基本用法
-const template = '你好，{{name}}！今天是{{date}}。';
+const template = '你好，{-{name}}！今天是{-{date}}。';
 const data = {
   name: '张三',
   date: '2025年1月1日'
@@ -147,7 +149,7 @@ function compileToFunction(
 | --- | --- | --- |
 | template | string | 模板字符串 |
 | options | object | 可选。编译选项 |
-| options.openTag | string | 可选。开始标记，默认为 '{{' |
+| options.openTag | string | 可选。开始标记，默认为 '{-{' |
 | options.closeTag | string | 可选。结束标记，默认为 '}}' |
 | options.escape | boolean | 可选。是否自动转义 HTML，默认为 true |
 
@@ -163,9 +165,9 @@ import { compileToFunction } from 'ft-base-tools';
 // 使用 JavaScript 表达式
 const template = `
 <ul>
-  {{for (let i = 0; i < items.length; i++) {}}
-    <li>{{items[i].name}} - {{items[i].price}}元</li>
-  {{}}
+  {-{ for (let i = 0; i < items.length; i++) { }}
+    <li>{-{ items[i].name }} - {-{ items[i].price }}元</li>
+  {-{ } }}
 </ul>
 `;
 
@@ -191,11 +193,11 @@ console.log(render(data));
 // 条件渲染
 const conditionalTemplate = `
 <div>
-  {{if (user.isVIP) {}}
-    <span>VIP用户：{{user.name}}</span>
-  {{} else {}}
-    <span>普通用户：{{user.name}}</span>
-  {{}}
+  {-{ if (user.isVIP) { }}
+    <span>VIP用户：{-{ user.name }}</span>
+  {-{ } else { }}
+    <span>普通用户：{-{ user.name }}</span>
+  {-{ } }}
 </div>
 `;
 
@@ -235,7 +237,7 @@ function createTemplate(
 | 参数 | 类型 | 描述 |
 | --- | --- | --- |
 | options | object | 可选。模板引擎选项 |
-| options.openTag | string | 可选。开始标记，默认为 '{{' |
+| options.openTag | string | 可选。开始标记，默认为 '{-{' |
 | options.closeTag | string | 可选。结束标记，默认为 '}}' |
 | options.escape | boolean | 可选。是否自动转义 HTML，默认为 true |
 | options.cache | boolean | 可选。是否缓存编译后的模板，默认为 true |
@@ -446,7 +448,7 @@ function parseTemplate(
 | --- | --- | --- |
 | template | string | 模板字符串 |
 | options | object | 可选。解析选项 |
-| options.openTag | string | 可选。开始标记，默认为 '{{' |
+| options.openTag | string | 可选。开始标记，默认为 '{-{' |
 | options.closeTag | string | 可选。结束标记，默认为 '}}' |
 
 ### 返回值
@@ -458,7 +460,7 @@ function parseTemplate(
 ```javascript
 import { parseTemplate } from 'ft-base-tools';
 
-const template = '你好，{{name}}！今天是{{date}}。';
+const template = '你好，{-{name}}！今天是{-{date}}。';
 const parsed = parseTemplate(template);
 
 console.log(parsed.tokens);
@@ -512,8 +514,8 @@ registerHelper('formatMoney', (amount) => {
 // 使用助手函数
 const template = `
 <div>
-  <p>日期：{{formatDate(date)}}</p>
-  <p>金额：{{formatMoney(amount)}}</p>
+  <p>日期：{-{formatDate(date)}}</p>
+  <p>金额：{-{formatMoney(amount)}}</p>
 </div>
 `;
 
@@ -563,8 +565,8 @@ console.log(helpers.formatDate('2025-01-01')); // '2025年1月1日'
 ```
 
 ```javascript
-// 修复前后的示例代码，确保所有的 {{ 都有对应的 }}
-const template = '你好，{{ name }}！今年{{ age }}岁了。';
+// 修复前后的示例代码，确保所有的 {-{ 都有对应的 }}
+const template = '你好，{-{ name }}！今年{-{ age }}岁了。';
 const data = {
   name: '张三',
   age: 25
