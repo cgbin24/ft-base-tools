@@ -7,6 +7,7 @@ export default defineConfig({
   lastUpdated: true,
 
   themeConfig: {
+    base: '/ft-base-tools/',
     // logo: '/logo.png',
     nav: [
       { text: '首页', link: '/' },
