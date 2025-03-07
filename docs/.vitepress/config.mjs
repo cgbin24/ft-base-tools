@@ -5,9 +5,9 @@ export default defineConfig({
   description: '高效、轻量的前端工具库',
   lang: 'zh-CN',
   lastUpdated: true,
+  base: '/ft-base-tools/',
 
   themeConfig: {
-    base: '/ft-base-tools/',
     // logo: '/logo.png',
     nav: [
       { text: '首页', link: '/' },
